@@ -1,6 +1,6 @@
 
 
-import EmptyState from "@/components/EmptyState";
+import EmptyState from "@/app/components/EmptyState";
 import { signOut } from "next-auth/react";
 
 const Users = () => {
