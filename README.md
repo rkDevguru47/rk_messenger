@@ -1,3 +1,22 @@
+Nextjs 13.4.2 web messenger app with full CRUD messages sent and recieve in real time using pusher, Oauth login from google and github, group chat functions,
+created using next13, tailwindcss, headlessui, ... 
+Supports image and file messageing using Cloudinary.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
