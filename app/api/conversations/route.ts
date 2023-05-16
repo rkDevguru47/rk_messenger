@@ -2,7 +2,7 @@ import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
-    //import { pusherServer } from "@/app/libs/pusher";
+import { pusherServer } from "@/app/libs/pusher";
 
 export async function POST(
   request: Request,
@@ -44,51 +44,68 @@ export async function POST(
         include: {
           users: true,
         }
-
       });
-      return NextResponse.json(newConversation)
+
+       // Update all connections with new conversation
+      newConversation.users.forEach((user) => {
+        if (user.email) {
+          pusherServer.trigger(user.email, 'conversation:new', newConversation);
+        }
+      });
+
+      return NextResponse.json(newConversation);
     }
+
     const existingConversations = await prisma.conversation.findMany({
-        where: {
-          OR: [
+      where: {
+        OR: [
+          {
+            userIds: {
+              equals: [currentUser.id, userId]
+            }
+          },
+          {
+            userIds: {
+              equals: [userId, currentUser.id]
+            }
+          }
+        ]
+      }
+    });
+
+    const singleConversation = existingConversations[0];
+
+    if (singleConversation) {
+      return NextResponse.json(singleConversation);
+    }
+
+    const newConversation = await prisma.conversation.create({
+      data: {
+        users: {
+          connect: [
             {
-              userIds: {
-                equals: [currentUser.id, userId]
-              }
+              id: currentUser.id
             },
             {
-              userIds: {
-                equals: [userId, currentUser.id]
-              }
+              id: userId
             }
           ]
         }
-      });
-      const singleConversation = existingConversations[0];
-      if (singleConversation) {
-        return NextResponse.json(singleConversation);
+      },
+      include: {
+        users: true
       }
-      const newConversation = await prisma.conversation.create({
-        data: {
-          users: {
-            connect: [
-              {
-                id: currentUser.id
-              },
-              {
-                id: userId
-              }
-            ]
-          }
-        },
-        include: {
-          users: true
-        }
-      });
+    });
+
+    // Update all connections with new conversation
+    newConversation.users.map((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:new', newConversation);
+      }
+    });
 
     return NextResponse.json(newConversation)
-  } 
-  catch (error) {
+  } catch (error) {
     return new NextResponse('Internal Error', { status: 500 });
   }
 }
