@@ -1,3 +1,12 @@
+Messenger app with group-chat and image sharing facility.
+
+
+
+
+
+
+
+
 Nextjs 13.4.2 web messenger app with full CRUD messages sent and recieve in real time using pusher, Oauth login from google and github, group chat functions,
 created using next13, tailwindcss, headlessui, ... 
 Supports image and file messageing using Cloudinary.
